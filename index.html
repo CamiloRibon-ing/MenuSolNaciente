@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -13,931 +13,159 @@
 </head>
 
 <body>
-  <!-- Preloader (igual que tienes) -->
-<div id="preloader">
-  <div class="preloader-logo">
-    <img src="recursos/LOGOSOLNACIENTE-SINFONDO.png" alt="Logo">
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="preloader-modern">
+      <div class="preloader-spinner"></div>
+      <img src="recursos/LOGOSOLNACIENTE-SINFONDO.png" alt="Logo" class="preloader-logo-modern">
+    </div>
   </div>
-</div>
 
-<header>
-  <img src="recursos/LOGOSOLNACIENTE-SINFONDO.png" alt="Logo Sol Naciente">
-  <h1>Centro Recreacional Sol Naciente</h1>
+  <!-- Header -->
+  <header>
+    <img src="recursos/LOGOSOLNACIENTE-SINFONDO.png" alt="Logo Sol Naciente">
+    <h1>Centro Recreacional Sol Naciente</h1>
+    <a href="html/admin.html" class="admin-btn" title="Panel de administración"><i class="fa fa-user-shield"></i> Panel Admin</a>
+    <div class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" role="button">☰</div>
+  </header>
 
-  <!-- botón hamburguesa -->
-  <div class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" role="button">
-    <!-- puedes usar un ícono o ☰ -->
-    ☰
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Nuestro Menú</h2>
+      <p>Descubre nuestras deliciosas opciones</p>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Categorías (Botones Horizontales) -->
+  <div class="categorias-container">
+    <div class="menu-buscador">
+      <i class="fa fa-search"></i>
+      <input type="search" id="buscador-menu" placeholder="Buscar plato o bebida..." autocomplete="off">
+      <button type="button" id="limpiar-busqueda" aria-label="Limpiar búsqueda">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    <div class="categorias-scroll" id="categorias-scroll">
+      <button class="cat-btn cat-btn-activo" data-cat="todos">Todos</button>
+      <!-- Se llenan dinámicamente desde Supabase -->
+    </div>
   </div>
-</header>
 
-<!-- IMPORTANTE: poner id="navbar" -->
-<nav id="navbar">
-  
-  <a href="#picadas">Picadas</a>
-  <a href="#almuerzos">Almuerzos</a>
-  <a href="#desayunos">Desayunos</a>
-  <a href="#infantil">Menú Infantil</a>
-  <a href="#especiales">Platos Especiales</a>
-  <a href="#bebidas">Bebidas</a>
-  <a href="#adiciones">Adiciones</a>
-  <a href="#jugos">Jugos</a>
-  <a href="#limonadas">Limonadas</a>
-  <a href="#raspados">Raspados</a>
-  <a href="#whisky">Bebidas alcohólicas</a>
-  <a href="#cervezas">Cervezas</a>
-</nav>
+  <!-- Menú Hamburguesa (mobile) -->
+  <nav id="navbar">
+    <div id="nav-cargando" style="padding:10px;color:#888">Cargando menú...</div>
+  </nav>
 
+  <!-- Contenedor de Productos -->
+  <div id="menu-contenedor" class="productos-container">
+    <div id="menu-cargando" class="menu-cargando">
+      <div class="spinner-menu"></div>
+      <p>Cargando carta...</p>
+    </div>
+  </div>
 
+  <!-- Footer -->
+  <footer>
+    <p>📍 Restaurante Sol Naciente - Contacto: 304 489 1274</p>
 
-
-  <section id="picadas">
-
-    <h2>🥩 Picadas</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/comidasrapidas.jpg" alt="Picada Personal">
-        <div class="card-body">
-          <h3>Picada Personal</h3>
-          <p>Patacones, queso costeño, chorizo, butifarra,
-ensalada, papa frita, yuca frita, carnes (cerdo,
-pechuga, carne) </p>
-          <p class="price">$25.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Recomendado</a>
-      </div>
-      <div class="card">
-        <img src="recursos/picadasxs.jpeg" alt="Picada XS">
-        <div class="card-body">
-          <h3>Picada XS</h3>
-          <p>Patacones, queso costeño, chorizo, butifarra,
-ensalada, papa frita, yuca frita, carnes (cerdo,
-pechuga, carne) </p>
-          <p class="price">$30.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Recomendado</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/picadasS.jpeg" alt="Picada XS">
-        <div class="card-body">
-          <h3>Picada S</h3>
-          <p>Patacones, queso costeño, chorizo, butifarra,
-ensalada, papa frita, yuca frita, carnes (cerdo,
-pechuga, carne) </p>
-          <p class="price">$40.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Recomendado</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/images.jpeg" alt="Picada XS">
-        <div class="card-body">
-          <h3>Picada M</h3>
-          <p>Patacones, queso costeño, chorizo, butifarra,
-ensalada, papa frita, yuca frita, carnes (cerdo,
-pechuga, carne) </p>
-          <p class="price">$50.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Recomendado</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/picadaL.jpeg" alt="Picada XS">
-        <div class="card-body">
-          <h3>Picada L</h3>
-          <p>Patacones, queso costeño, chorizo, butifarra,
-ensalada, papa frita, yuca frita, carnes (cerdo,
-pechuga, carne) </p>
-          <p class="price">$60.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Recomendado</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/picadasXL.jpeg" alt="Picada XS">
-        <div class="card-body">
-          <h3>Picada XL</h3>
-          <p>Patacones, queso costeño, chorizo, butifarra,
-ensalada, papa frita, yuca frita, carnes (cerdo,
-pechuga, carne) </p>
-          <p class="price">$80.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Recomendado</a>
-      </div>
-
+    <div class="social-icons">
+      <a href="https://wa.me/573044891274" target="_blank" aria-label="WhatsApp" class="whatsapp">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+      <a href="https://www.instagram.com/crc_solnaciente?igsh=dDAzb3ZobW43ODNv" target="_blank" aria-label="Instagram" class="instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://www.facebook.com/share/1A2YYmo2e3/" target="_blank" aria-label="Facebook" class="facebook">
+        <i class="fab fa-facebook"></i>
+      </a>
     </div>
 
-
-
-
-  </section>
-
-  <section id="almuerzos">
-    <h2>🍛 Almuerzos</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/almuerzosejecutivos.jpeg" alt="Corriente">
-        <div class="card-body">
-          <h3>Corriente</h3>
-          <p>Arroz, ensalada, patacones, sopa, carnes (pechuga, cerdo, res).</p>
-          <p class="price">$16.000</p>
-        </div>
-        <a href="#" class="btn">🍴 Más pedido</a>
+    <div class="metodos-pago">
+      <div class="pago">
+        <img src="recursos/Nequilogo.png" alt="Nequi Logo">
+        <span><strong>Nequi:</strong> 304 489 1274</span>
       </div>
-      <div class="card">
-        <img src="recursos/sancochogallina.jpeg" alt="Gallina">
-        <div class="card-body">
-          <h3>Gallina</h3>
-          <p>Arroz, ensalada, patacones y sopa.</p>
-          <p class="price">$25.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Recomendado</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/asados.jpeg" alt="asado">
-        <div class="card-body">
-          <h3>Asado</h3>
-          <p>Patacones, papa frita, ensalada, carnes (pechuga, cerdo, res)</p>
-          <p class="price">$22.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/mojarra.jpeg" alt="Gallina">
-        <div class="card-body">
-          <h3>Mojarra</h3>
-          <p>Arroz, ensalada, patacones y sopa.</p>
-          <p class="price">$25.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/costilla.jpeg" alt="Gallina">
-        <div class="card-body">
-          <h3>Costilla Frita</h3>
-          <p>Arroz, ensalada, patacones, sopa</p>
-          <p class="price">$22.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Especial de la casa</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/sancochogallina.jpeg" alt="Gallina">
-        <div class="card-body">
-          <h3>Sopa</h3>
-          <p>Plato de sopa.</p>
-          <p class="price">$8.000</p>
-        </div>
-        <a href="#" class="btn">🥗 Saludable</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/arrozconsopa.jpeg" alt="Gallina">
-        <div class="card-body">
-          <h3>Sopa</h3>
-          <p>Arroz, ensalada y sopa.</p>
-          <p class="price">$10.000</p>
-        </div>
-        <a href="#" class="btn">🥗 Saludable</a>
-      </div>
-
-
-
-    </div>
-  </section>
-
-  <section id="desayunos">
-    <h2>☕ Desayunos</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/desayunos4.webp" alt="Desayuno 1">
-        <div class="card-body">
-          <h3>Desayunos</h3>
-          <p>Patacones, chorizo, queso + bebida (jugo, cafe).</p>
-          <p class="price">$8.000</p>
-        </div>
-        <a href="#" class="btn">🍴 Más pedido</a>
-      </div>
-      <div class="card">
-        <img src="recursos/desayunos.jpeg" alt="Desayuno 2">
-        <div class="card-body">
-          <h3>Desayunos </h3>
-          <p>Arepa asada, huevo, chorizo + bebida (jugo, cafe).</p>
-          <p class="price">$8.000</p>
-        </div>
-        <a href="#" class="btn">🍴 Más pedido</a>
+      <div class="pago">
+        <img src="recursos/lobancolombia.png" alt="Bancolombia Logo">
+        <span><strong>Bancolombia:</strong> 39878846650</span>
       </div>
     </div>
-  </section>
+  </footer>
 
-  <section id="infantil">
-    <h2>👶 Menú Infantil</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/desayunosinfantiles.jpeg" alt="Nuggets con papas">
-        <div class="card-body">
-          <h3>Nuggets con papas</h3>
-          <p>Acompañado de jugo de caja.</p>
-          <p class="price">$15.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Especial de la casa</a>
-      </div>
-      <div class="card">
-        <img src="recursos/desayunosinfantiles2.jpeg" alt="Mini Hamburguesa">
-        <div class="card-body">
-          <h3>Mini Hamburguesa</h3>
-          <p>Con papas y jugo de caja.</p>
-          <p class="price">$16.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Especial de la casa</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/perrosminis2.jpeg" alt="Mini Hamburguesa">
-        <div class="card-body">
-          <h3>Perro Caliente</h3>
-          <p>Mas gaseosa mini.</p>
-          <p class="price">$10.000</p>
-        </div>
-        <a href="#" class="btn">⭐ Especial de la casa</a>
-      </div>
+  <!-- Botones Flotantes -->
+  <div class="floating-buttons">
+    <div class="floating-btn nequi" id="btn-nequi">
+      <img src="recursos/Nequilogo.png" alt="Nequi">
+      <span class="tooltip">Paga desde Nequi</span>
     </div>
-  </section>
-
-  <section id="especiales">
-    <h2>🍽️ Platos Especiales</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/platoespeciales.jpeg" alt="Plato Especial">
-        <div class="card-body">
-          <h3>Plato Especial</h3>
-          <p>Arroz, dos proteínas, ensalada,(vegetales y blanca) puré y gaseosa.</p>
-          <p class="price">$35.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
+    <div class="floating-btn bancolombia" id="btn-bancolombia">
+      <img src="recursos/lobancolombia.png" alt="Bancolombia">
+      <span class="tooltip">Paga desde Bancolombia</span>
     </div>
-  </section>
-
-
-
-
-
-
-
-  <section id="adiciones">
-    <h2>🍽️ adiciones</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/papasalafrancesa.jpeg" alt="Adiciones">
-        <div class="card-body">
-          <h3>Papa a la francesa</h3>
-          <p>Papa a la francesa</p>
-          <p class="price">$5.000</p>
-        </div>
-        <a href="#" class="btn">⚡ Rápido y delicioso</a>
-      </div>
-
-        <div class="card">
-          <img src="recursos/chorizo.jpeg" alt="Porcion Chorizo">
-          <div class="card-body">
-            <h3>Porcion Chorizo</h3>
-            <p>Porcion chorizo.</p>
-            <p class="price">$5.000</p>
-          </div>
-          <a href="#" class="btn">⚡ Rápido y delicioso</a>
-        </div>
-
-
-
-        <div class="card">
-          <img src="recursos/porcionarroz.jpeg" alt="Porcion Arroz">
-          <div class="card-body">
-            <h3>Porcion Arroz</h3>
-            <p>Porcion Arroz.</p>
-            <p class="price">$2.000</p>
-          </div>
-          <a href="#" class="btn">⚡ Rápido y delicioso</a>
-        </div>
-
-
-        <div class="card">
-          <img src="recursos/porcionpatacones.jpeg" alt="Porcion Patacones">
-          <div class="card-body">
-            <h3>Porcion Patacones</h3>
-            <p>Porcion Patacones.</p>
-            <p class="price">$5.000</p>
-          </div>
-          <a href="#" class="btn">⚡ Rápido y delicioso</a>
-        </div>
-    </div>
-  </section>
-
-
-
-
-
-
-  <section id="jugos">
-    <h2>Jugos Naturales</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/bebidassaludables.jpeg" alt="Plato Especial">
-        <div class="card-body">
-          <h3>Sencillo</h3>
-          <p>Sencillo con agua</p>
-          <p class="price">$8.000</p>
-        </div>
-        <a href="#" class="btn">🍹 Refrescante</a>
-      </div>
-
-
-        <div class="card">
-          <img src="recursos/bebidassaludables2.jpg" alt="Desayuno 2">
-          <div class="card-body">
-            <h3>Sencillo con leche</h3>
-            <p class="price">$10.000</p>
-          </div>
-          <a href="#" class="btn">🍹 Refrescante</a>
-        </div>
-
-    </div>
-  </section>
-
-
-
-
-
-
-
-
-
-
-
-  <section id="bebidas">
-    <h2>🥤 Bebidas</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/bebidaspostobon.jpeg" alt="postobon">
-        <div class="card-body">
-          <h3>Postobon</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">🍹 Refrescante</a>
-      </div>
-      <div class="card">
-        <img src="recursos/cocacolapersonal.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Coca Cola Personal</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">❤️ Lo que más gusta</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/cocacola1.5.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Coca Cola 1.5L</h3>
-
-          <p class="price">$10.000</p>
-        </div>
-        <a href="#" class="btn">❤️ Lo que más gusta</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/cocacola2.5.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Coca Cola 2.5L</h3>
-
-          <p class="price">$12.000</p>
-        </div>
-        <a href="#" class="btn">❤️ Lo que más gusta</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/cocacola3litros.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Coca Cola 3L</h3>
-
-          <p class="price">$14.000</p>
-        </div>
-        <a href="#" class="btn">❤️ Lo que más gusta</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/jugoshit.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Jugo Hit</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">🍹 Refrescante</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/botellaaguagrande.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Agua Grande</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">💲 Económico</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/botellaaguapequeña.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Agua Pequeña</h3>
-
-          <p class="price">$1.500</p>
-        </div>
-        <a href="#" class="btn">💲 Económico</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/gatorade.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Gatorade</h3>
-
-          <p class="price">$5.000</p>
-        </div>
-        <a href="#" class="btn">🍹 Refrescante</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/speedmax.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Speed Max</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">🍹 Refrescante</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/sodabretaña.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Soda</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">💲 Económico</a>
-      </div>
-
-
-
-
-      <div class="card">
-        <img src="recursos/sodaginger.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Soda Ginger</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">💲 Económico</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/electrolit.jpeg" alt="Gaseosa">
-        <div class="card-body">
-          <h3>Electrolit</h3>
-
-          <p class="price">$10.000</p>
-        </div>
-        <a href="#" class="btn">🍹 Refrescante</a>
-      </div>
-    </div>
-  </section>
-
-
-
-
-  <section id="limonadas">
-    <h2>Limonadas</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/limonadasbrasilera.jpeg" alt="Plato Especial">
-        <div class="card-body">
-          <h3>Limonada Brasilera</h3>
-
-          <p class="price">$10.000</p>
-        </div>
-        <a href="#" class="btn">🍹 Refrescante</a>
-      </div>
-
-        <div class="card">
-          <img src="recursos/limonadacoco.jpeg" alt="Desayuno 2">
-          <div class="card-body">
-            <h3>Limonada de coco</h3>
-            <p class="price">$10.000</p>
-          </div>
-          <a href="#" class="btn">🍹 Refrescante</a>
-        </div>
-
-
-        <div class="card">
-          <img src="recursos/limonadacereza.jpeg" alt="Desayuno 2">
-          <div class="card-body">
-            <h3>Limonada de Cerezada</h3>
-            <p class="price">$10.000</p>
-          </div>
-          <a href="#" class="btn">🥇 Top favorito</a>
-        </div>
-
-      </div>
-  </section>
-
-
-
-  <section id="raspados">
-    <h2>Raspados</h2>
-   <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/raspadokola.jpeg" alt="Plato Especial">
-        <div class="card-body">
-          <h3>Raspado de Kola</h3>
-
-          <p class="price">$2.000</p>
-        </div>
-        <a href="#" class="btn">💲 Económico</a>
-      </div>
-        <div class="card">
-          <img src="recursos/raspadochicle.jpeg" alt="Desayuno 2">
-          <div class="card-body">
-            <h3>Raspado de Chicle</h3>
-            <p class="price">$2.000</p>
-          </div>
-          <a href="#" class="btn">💲 Económico</a>
-        </div>
-
-
-        <div class="card">
-          <img src="recursos/raspadomaracuya.jpeg" alt="Desayuno 2">
-          <div class="card-body">
-            <h3>Raspado de Maracuya</h3>
-            <p class="price">$2.000</p>
-          </div>
-          <a href="#" class="btn">💲 Económico</a>
-        </div>
-
-
-      </div>
-  </section>
-
-
-
-  <section id="whisky">
-    <h2>🍺 Whisky</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/oldparr.jpeg" alt="Cervezas">
-        <div class="card-body">
-          <h3>Old parr</h3>
-          <p class="price">$180.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-      <div class="card">
-        <img src="recursos/buschanas.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Buchanan’s</h3>
-          <p>Master 750 ml.</p>
-          <p class="price">$240.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/medellin8años.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Medellin</h3>
-          <p>Medellin 8 años.</p>
-          <p class="price">$95.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/medellin3años.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Medellin</h3>
-          <p>Medellin 3 años.</p>
-          <p class="price">$75.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/aguardienteamarillo.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Aguardiente</h3>
-          <p>Aguardiente Amarillo.</p>
-          <p class="price">$65.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/aguardientepipona.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Aguardiente Pipona</h3>
-
-          <p class="price">$65.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/limusinaguardiente.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Aguardiente Limosina</h3>
-
-          <p class="price">$85.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/aguardientegarrafa.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Aguardiente Garrafa</h3>
-
-          <p class="price">$130.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-    </div>
-  </section>
-
-
-  <section id="cervezas">
-    <h2>🍺Cervezas</h2>
-    <div class="menu-grid">
-      <div class="card">
-        <img src="recursos/costeñitapersonal.jpeg" alt="Cervezas">
-        <div class="card-body">
-          <h3>Costeñita</h3>
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-      <div class="card">
-        <img src="recursos/pokerpersonal.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Poker</h3>
-
-          <p class="price">$3.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/budweiser.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Budweiser</h3>
-
-          <p class="price">4.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/aguilanegrapersonal.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Aguila Negra</h3>
-
-          <p class="price">$4.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/aguilalight.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Aguila Light</h3>
-
-          <p class="price">$4.000</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/clubcolombiapersonal.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Club colombia</h3>
-
-          <p class="price">$4.500</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/coronita.jpeg" alt="Licores">
-        <div class="card-body">
-          <h3>Coronita</h3>
-
-          <p class="price">$4.500</p>
-        </div>
-        <a href="#" class="btn">🥂 Para celebrar</a>
-      </div>
-
-
-    </div>
-  </section>
-
-
-  <section id="cheladas">
-    <h2>🍹 Cheladas</h2>
-    <div class="menu-grid">
-      <!-- <div class="card">
-        <img src="recursos/bebidas2.jpeg" alt="Cheladas">
-        <div class="card-body">
-          <h3>Variedades de Cheladas</h3>
-          <p>Maracuyá, Frutos Rojos, Manzana Verde, Kiwi, Mango Verde, Fresa.</p>
-          <p class="price">Soda $10.000 | Ginger $12.000 | Cerveza $12.000</p>
-        </div>
-        <a href="#" class="btn">Comprar</a>
-      </div> -->
-
-      <div class="card">
-        <img src="recursos/micheladamangoverde.jpeg" alt="Cheladas">
-        <div class="card-body">
-          <h3>Mango Verde</h3>
-
-          <p class="price">Soda $10.000 | Ginger $12.000 | Cerveza $12.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/micheladakiwi.jpeg" alt="Cheladas">
-        <div class="card-body">
-          <h3>Kiwi</h3>
-
-          <p class="price">Soda $10.000 | Ginger $12.000 | Cerveza $12.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-
-
-      <div class="card">
-        <img src="recursos/micheladamaracuya.jpeg" alt="Cheladas">
-        <div class="card-body">
-          <h3>Maracuya</h3>
-        
-          <p class="price">Soda $10.000 | Ginger $12.000 | Cerveza $12.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-      <div class="card">
-        <img src="recursos/micheladafrutosrojos.jpeg" alt="Cheladas">
-        <div class="card-body">
-          <h3>Frutos Rojos</h3>
-        
-          <p class="price">Soda $10.000 | Ginger $12.000 | Cerveza $12.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-
-      <div class="card">
-        <img src="recursos/micheladasmanzanaverde.jpeg" alt="Cheladas">
-        <div class="card-body">
-          <h3>Manzana Verde</h3>
-      
-          <p class="price">Soda $10.000 | Ginger $12.000 | Cerveza $12.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-
-
-      
-      <div class="card">
-        <img src="recursos/micheladafresa2.jpeg" alt="Cheladas">
-        <div class="card-body">
-          <h3>Fresa</h3>
-      
-          <p class="price">Soda $10.000 | Ginger $12.000 | Cerveza $12.000</p>
-        </div>
-        <a href="#" class="btn">🥇 Top favorito</a>
-      </div>
-    </div>
-  </section>
-<footer>
-  <p>📍 Restaurante Sol Naciente - Contacto: 304 489 1274</p>
-
-  <div class="social-icons">
-    <a href="https://wa.me/573044891274" target="_blank" aria-label="WhatsApp">
+    <a href="https://wa.me/573044891274" target="_blank" class="floating-btn whatsapp">
       <i class="fab fa-whatsapp"></i>
+      <span class="tooltip">Contactanos</span>
     </a>
-    <a href="https://www.instagram.com/crc_solnaciente?igsh=dDAzb3ZobW43ODNv" target="_blank" aria-label="Instagram">
+    <a href="https://www.instagram.com/crc_solnaciente?igsh=dDAzb3ZobW43ODNv" target="_blank" class="floating-btn instagram">
       <i class="fab fa-instagram"></i>
+      <span class="tooltip">Síguenos</span>
     </a>
-    <a href="https://www.facebook.com/share/1A2YYmo2e3/" target="_blank" aria-label="Facebook">
-      <i class="fab fa-facebook"></i>
+    <a href="https://www.facebook.com/share/1A2YYmo2e3/" target="_blank" class="floating-btn facebook">
+      <i class="fab fa-facebook-f"></i>
+      <span class="tooltip">Síguenos</span>
     </a>
   </div>
 
-  <!-- Métodos de pago -->
-  <div class="metodos-pago">
-    <div class="pago">
-      <img src="recursos/Nequilogo.png" alt="Nequi Logo">
-      <span><strong>Nequi:</strong> 304 489 1274</span>
+  <!-- Modales de Pago -->
+  <div class="modal" id="nequiModal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>Paga con Nequi</h2>
+      <img src="recursos/Nequilogo.png" alt="QR Nequi">
+      <p><strong>Nequi:</strong> 304 489 1274</p>
     </div>
-    <div class="pago">
+  </div>
+
+  <div class="modal" id="bancoModal">
+    <div class="modal-content">
+      <span class="close" id="closeBanco">&times;</span>
+      <h2>Paga con Bancolombia</h2>
       <img src="recursos/lobancolombia.png" alt="Bancolombia Logo">
-      <span><strong>Bancolombia:</strong> 39878846650</span>
+      <p><strong>Bancolombia:</strong> 39878846650</p>
     </div>
   </div>
-</footer>
 
-
-<!-- ===== BOTÓN FLOTANTE NEQUI ===== -->
-<div class="floating-buttons">
-  <div class="floating-btn nequi" id="btn-nequi">
-    <img src="recursos/Nequilogo.png" alt="Nequi">
-    <span class="tooltip">Paga desde Nequi</span>
+  <!-- Modal Detalle Producto -->
+  <div id="modal-detalle" class="modal-detalle" role="dialog" aria-modal="true">
+    <div class="modal-detalle-overlay" onclick="cerrarDetalle()"></div>
+    <div class="modal-detalle-contenido">
+      <button class="btn-cerrar-detalle" onclick="cerrarDetalle()" aria-label="Cerrar">
+        <i class="fa fa-times"></i>
+      </button>
+      <div id="detalle-img-wrap" class="detalle-img-wrap"></div>
+      <div class="detalle-info">
+        <span id="detalle-badge" class="detalle-badge" style="display:none"></span>
+        <h2 id="detalle-nombre"></h2>
+        <p id="detalle-desc" class="detalle-desc" style="display:none"></p>
+        <p id="detalle-precio" class="detalle-precio"></p>
+        <a id="detalle-whatsapp" class="btn-wa-pedir" href="https://wa.me/573044891274" target="_blank" rel="noopener">
+          <i class="fab fa-whatsapp"></i>
+          Pedir por WhatsApp
+        </a>
+      </div>
+    </div>
   </div>
-  <!-- Botón flotante Bancolombia -->
-<div class="floating-btn bancolombia" id="btn-bancolombia">
-  <img src="recursos/lobancolombia.png" alt="Bancolombia">
-  <span class="tooltip">Paga desde Bancolombia</span>
-</div>
-  <a href="https://wa.me/573044891274" target="_blank" class="floating-btn whatsapp">
-    <i class="fab fa-whatsapp"></i>
-    <span class="tooltip">Contactanos</span>
-  </a>
-  <a href="https://www.instagram.com/crc_solnaciente?igsh=dDAzb3ZobW43ODNv" target="_blank" class="floating-btn instagram">
-    <i class="fab fa-instagram"></i>
-    <span class="tooltip">Conoce mas sobre Nosotros</span>
-  </a>
-  <a href="https://www.facebook.com/share/1A2YYmo2e3/" target="_blank" class="floating-btn facebook">
-    <i class="fab fa-facebook-f"></i>
-    <span class="tooltip">Conoce mas sobre nosotros</span>
-  </a>
-</div>
 
+  <button type="button" id="btn-volver-arriba" class="btn-volver-arriba" aria-label="Volver arriba">
+    <i class="fa fa-arrow-up"></i>
+  </button>
 
-<!-- ===== MODAL QR ===== -->
-<div class="modal" id="nequiModal">
-  <div class="modal-content">
-    <span class="close" id="closeModal">&times;</span>
-    <h2>Paga con Nequi</h2>
-    <img src="recursos/Nequilogo.png" alt="QR Nequi">
-    <p><strong>Nequi:</strong> 304 489 1274</p>
-  </div>
-  
-</div>
-
-<div class="modal" id="bancoModal">
-  <div class="modal-content">
-    <span class="close" id="closeBanco">&times;</span>
-    <h2>Paga con Bancolombia</h2>
-    <img src="recursos/lobancolombia.png" alt="Bancolombia Logo">
-    <p><strong>Bancolombia:</strong> 39878846650</p>
-  </div>
-</div>
-
-
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/menu.js"></script>
   <script src="js/script.js" defer></script>
 </body>
 

@@ -1,60 +1,70 @@
-
-// js/main.js
 document.addEventListener('DOMContentLoaded', () => {
-  // PRELOADER: mantiene la lógica que ya usabas pero más segura
   const preloader = document.getElementById('preloader');
   window.addEventListener('load', () => {
-    // espera un poco para que la transición sea visible
-    setTimeout(()=> {
+    setTimeout(() => {
       if (preloader) preloader.classList.add('hide');
-    }, 600); // bajé el timeout a 600ms para mejorar sensación de velocidad
+    }, 600);
   });
 
-  // MENU HAMBURGUESA (robusto)
   const toggle = document.getElementById('menu-toggle');
   const nav = document.getElementById('navbar');
 
   if (!toggle) console.warn('menu-toggle no encontrado (id="menu-toggle")');
   if (!nav) console.warn('navbar no encontrado (id="navbar")');
 
+  function ajustarAdminBtn() {
+    if (!nav) return;
+    const adminMobile = nav.querySelector('.admin-link-mobile');
+    if (!adminMobile) return;
+    adminMobile.style.display = window.innerWidth > 768 ? 'none' : 'block';
+  }
+
   if (toggle && nav) {
-    // accesibilidad: aria-expanded
-    toggle.addEventListener('click', () => {
-      const isOpen = nav.classList.toggle('show'); // añade/remueve clase .show
-      toggle.classList.toggle('open'); // para animar icono si quieres
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = nav.classList.toggle('show');
+      toggle.classList.toggle('open');
       toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 
-    // cerrar menú al hacer clic en un enlace (útil en móvil)
-    nav.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-          nav.classList.remove('show');
-          toggle.classList.remove('open');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-    });
-
-    // cerrar menú si se redimensiona a escritorio
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768) {
+    nav.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A' && window.innerWidth <= 768) {
         nav.classList.remove('show');
         toggle.classList.remove('open');
         toggle.setAttribute('aria-expanded', 'false');
       }
     });
 
-    // opcional: cerrar al hacer clic fuera del nav
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        nav.classList.remove('show');
+        toggle.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+      ajustarAdminBtn();
+    });
+
     document.addEventListener('click', (e) => {
-      const target = e.target;
       if (window.innerWidth <= 768 && nav.classList.contains('show')) {
-        if (!nav.contains(target) && !toggle.contains(target)) {
+        if (!nav.contains(e.target) && !toggle.contains(e.target)) {
           nav.classList.remove('show');
           toggle.classList.remove('open');
           toggle.setAttribute('aria-expanded', 'false');
         }
       }
+    });
+
+    ajustarAdminBtn();
+  }
+
+  const btnVolverArriba = document.getElementById('btn-volver-arriba');
+  if (btnVolverArriba) {
+    window.addEventListener('scroll', () => {
+      btnVolverArriba.classList.toggle('visible', window.scrollY > 520);
+    }, { passive: true });
+
+    btnVolverArriba.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 });
@@ -64,39 +74,39 @@ const nequiModal = document.getElementById('nequiModal');
 const nequiBtn = document.getElementById('btn-nequi');
 const closeModal = document.getElementById('closeModal');
 
-// Modal de Nequi
-nequiBtn.addEventListener('click', () => {
-  nequiModal.style.display = 'flex';
-});
+if (nequiBtn && nequiModal) {
+  nequiBtn.addEventListener('click', () => {
+    nequiModal.classList.add('show');
+  });
+}
 
-closeModal.addEventListener('click', () => {
-  nequiModal.style.display = 'none';
-});
+if (closeModal && nequiModal) {
+  closeModal.addEventListener('click', () => {
+    nequiModal.classList.remove('show');
+  });
+}
 
-window.addEventListener('click', (e) => {
-  if (e.target === nequiModal) {
-    nequiModal.style.display = 'none';
-  }
-});
-// ====== Bancolombia ======
 const btnBanco = document.getElementById('btn-bancolombia');
 const bancoModal = document.getElementById('bancoModal');
 const closeBanco = document.getElementById('closeBanco');
 
-btnBanco.addEventListener('click', () => {
-  bancoModal.style.display = 'flex';
-});
-closeBanco.addEventListener('click', () => {
-  bancoModal.style.display = 'none';
-});
+if (btnBanco && bancoModal) {
+  btnBanco.addEventListener('click', () => {
+    bancoModal.classList.add('show');
+  });
+}
 
-// Cerrar si clic fuera
+if (closeBanco && bancoModal) {
+  closeBanco.addEventListener('click', () => {
+    bancoModal.classList.remove('show');
+  });
+}
+
 window.addEventListener('click', (e) => {
-  if (e.target === nequiModal) nequiModal.style.display = 'none';
-  if (e.target === bancoModal) bancoModal.style.display = 'none';
+  if (e.target === nequiModal) nequiModal.classList.remove('show');
+  if (e.target === bancoModal) bancoModal.classList.remove('show');
 });
 
-// Animación campana + glow en todos los botones
 setInterval(() => {
   buttons.forEach((btn, index) => {
     setTimeout(() => {
@@ -104,6 +114,6 @@ setInterval(() => {
       setTimeout(() => {
         btn.classList.remove('shake');
       }, 600);
-    }, index * 500); // desfase entre botones
+    }, index * 500);
   });
-}, 8000); // cada 8 segundos
+}, 8000);
