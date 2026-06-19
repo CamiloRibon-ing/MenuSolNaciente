@@ -424,22 +424,32 @@ function resetFormProducto() {
   const preview = document.getElementById('imagen-preview');
   preview.innerHTML = `<i class="fa fa-image icono-imagen"></i><p>Sin imagen</p>`;
   ocultarError('error-producto');
+  actualizarPreviewLiveProducto();
 }
 
-// ---- Previsualización de imagen ----
-document.getElementById('imagen-archivo').addEventListener('change', async (e) => {
-  const archivo = e.target.files[0];
+// ---- Imagen: selección, arrastre y subida ----
+const zonaImagen = document.getElementById('zona-imagen');
+const inputImagen = document.getElementById('imagen-archivo');
+
+function pintarPreviewImagen(src) {
+  const preview = document.getElementById('imagen-preview');
+  const liveImg = document.getElementById('preview-live-img');
+  preview.innerHTML = `<img src="${src}" alt="Preview">`;
+  liveImg.innerHTML = `<img src="${src}" alt="Preview">`;
+}
+
+function pintarPreviewImagenVacia() {
+  document.getElementById('imagen-preview').innerHTML = `<i class="fa fa-image icono-imagen"></i><p>Sin imagen</p>`;
+  document.getElementById('preview-live-img').innerHTML = `<i class="fa fa-utensils"></i>`;
+}
+
+async function manejarArchivoProducto(archivo) {
   if (!archivo) return;
 
-  // Vista previa local mientras sube
   const lector = new FileReader();
-  lector.onload = (ev) => {
-    const preview = document.getElementById('imagen-preview');
-    preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
-  };
+  lector.onload = (ev) => pintarPreviewImagen(ev.target.result);
   lector.readAsDataURL(archivo);
 
-  // Subir a Cloudinary
   const progreso = document.getElementById('progreso-upload');
   progreso.style.display = 'block';
 
@@ -447,21 +457,110 @@ document.getElementById('imagen-archivo').addEventListener('change', async (e) =
     const url = await cloudinaryService.subirImagen(archivo);
     document.getElementById('producto-imagen-url').value = url;
     document.getElementById('btn-quitar-imagen').style.display = 'inline-flex';
+    actualizarPreviewLiveProducto();
     mostrarToast('Imagen subida correctamente');
   } catch (err) {
     mostrarToast('Error al subir la imagen: ' + err.message, 'error');
     document.getElementById('producto-imagen-url').value = '';
+    document.getElementById('imagen-archivo').value = '';
+    document.getElementById('btn-quitar-imagen').style.display = 'none';
+    pintarPreviewImagenVacia();
   } finally {
     progreso.style.display = 'none';
   }
+}
+
+inputImagen.addEventListener('change', async (e) => {
+  await manejarArchivoProducto(e.target.files[0]);
+});
+
+zonaImagen.addEventListener('click', (e) => {
+  if (e.target.closest('button, label')) return;
+  inputImagen.click();
+});
+
+zonaImagen.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    inputImagen.click();
+  }
+});
+
+['dragenter', 'dragover'].forEach(evento => {
+  zonaImagen.addEventListener(evento, (e) => {
+    e.preventDefault();
+    zonaImagen.classList.add('drag-over');
+  });
+});
+
+['dragleave', 'drop'].forEach(evento => {
+  zonaImagen.addEventListener(evento, (e) => {
+    e.preventDefault();
+    zonaImagen.classList.remove('drag-over');
+  });
+});
+
+zonaImagen.addEventListener('drop', async (e) => {
+  const archivo = e.dataTransfer.files[0];
+  if (!archivo) return;
+  inputImagen.files = e.dataTransfer.files;
+  await manejarArchivoProducto(archivo);
 });
 
 document.getElementById('btn-quitar-imagen').addEventListener('click', () => {
   document.getElementById('producto-imagen-url').value = '';
   document.getElementById('imagen-archivo').value = '';
   document.getElementById('btn-quitar-imagen').style.display = 'none';
-  const preview = document.getElementById('imagen-preview');
-  preview.innerHTML = `<i class="fa fa-image icono-imagen"></i><p>Sin imagen</p>`;
+  pintarPreviewImagenVacia();
+});
+
+function actualizarPreviewLiveProducto() {
+  const nombre = document.getElementById('producto-nombre').value.trim() || 'Producto sin nombre';
+  const descripcion = document.getElementById('producto-descripcion').value.trim();
+  const precio = parseFloat(document.getElementById('producto-precio').value) || 0;
+  const precioDisplay = document.getElementById('producto-precio-display').value.trim();
+  const etiqueta = document.getElementById('producto-etiqueta').value.trim();
+  const categoriaId = document.getElementById('producto-categoria').value;
+  const categoria = categorias.find(cat => cat.id === categoriaId);
+  const activo = document.getElementById('producto-activo').checked;
+  const imagenUrl = document.getElementById('producto-imagen-url').value;
+
+  document.getElementById('preview-live-nombre').textContent = nombre;
+
+  const descEl = document.getElementById('preview-live-desc');
+  descEl.textContent = descripcion;
+  descEl.style.display = descripcion ? 'block' : 'none';
+
+  document.getElementById('preview-live-precio').textContent = precioDisplay || `$ ${Number(precio).toLocaleString('es-CO')}`;
+  document.getElementById('preview-live-categoria').textContent = categoria ? `${categoria.emoji || ''} ${categoria.nombre}` : 'Sin categoria';
+
+  const badge = document.getElementById('preview-live-badge');
+  badge.textContent = etiqueta;
+  badge.style.display = etiqueta ? 'inline-block' : 'none';
+
+  const estado = document.getElementById('preview-live-estado');
+  estado.textContent = activo ? 'Activo' : 'Inactivo';
+  estado.className = activo ? 'badge-activo' : 'badge-inactivo';
+
+  if (imagenUrl) {
+    document.getElementById('preview-live-img').innerHTML = `<img src="${escHtml(imagenUrl)}" alt="${escHtml(nombre)}">`;
+  } else if (!document.querySelector('#preview-live-img img')) {
+    pintarPreviewImagenVacia();
+  }
+}
+
+[
+  'producto-nombre',
+  'producto-categoria',
+  'producto-descripcion',
+  'producto-precio',
+  'producto-precio-display',
+  'producto-etiqueta',
+  'producto-activo'
+].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', actualizarPreviewLiveProducto);
+  el.addEventListener('change', actualizarPreviewLiveProducto);
 });
 
 // ---- Editar producto ----
@@ -493,6 +592,7 @@ function editarProducto(id) {
 
   document.getElementById('modal-producto-titulo').textContent = 'Editar Producto';
   ocultarError('error-producto');
+  actualizarPreviewLiveProducto();
   abrirModal('modal-producto');
 }
 

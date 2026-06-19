@@ -164,6 +164,8 @@
 
     <form id="form-producto">
       <input type="hidden" id="producto-id">
+      <div class="producto-form-layout">
+        <div class="producto-editor">
 
       <div class="dos-columnas">
         <div class="campo">
@@ -211,7 +213,7 @@
       <!-- Imagen -->
       <div class="campo">
         <label>Imagen del producto</label>
-        <div class="zona-imagen" id="zona-imagen">
+        <div class="zona-imagen" id="zona-imagen" tabindex="0">
           <div class="imagen-preview" id="imagen-preview">
             <i class="fa fa-image icono-imagen"></i>
             <p>Sin imagen</p>
@@ -235,6 +237,26 @@
       <div class="campo-check">
         <input type="checkbox" id="producto-activo" checked>
         <label for="producto-activo">Producto activo (visible en el menú)</label>
+      </div>
+
+        </div>
+
+        <aside class="producto-preview-live" aria-live="polite">
+          <h4>Vista previa</h4>
+          <div class="producto-preview-card">
+            <div id="preview-live-img" class="producto-preview-img">
+              <i class="fa fa-utensils"></i>
+            </div>
+            <div class="producto-preview-body">
+              <span id="preview-live-badge" class="badge-activo" style="display:none"></span>
+              <h3 id="preview-live-nombre">Producto sin nombre</h3>
+              <p id="preview-live-desc" style="display:none"></p>
+              <p id="preview-live-precio">$ 0</p>
+              <p id="preview-live-categoria">Sin categoria</p>
+              <span id="preview-live-estado" class="badge-activo">Activo</span>
+            </div>
+          </div>
+        </aside>
       </div>
 
       <div id="error-producto" class="alerta-error" style="display:none"></div>
