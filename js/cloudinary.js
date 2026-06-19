@@ -1,10 +1,13 @@
 // ============================================================
 // SERVICIO DE CLOUDINARY - Sol Naciente
-// La subida real se firma en /api/cloudinary-upload (Vercel).
+// Usa el unsigned upload preset configurado en Cloudinary.
 // ============================================================
 class CloudinaryService {
   constructor() {
-    this.uploadUrl = '/api/cloudinary-upload';
+    this.cloudName = 'dczdtij3q';
+    this.uploadPreset = 'luni_products';
+    this.folder = 'menusolnaciente';
+    this.uploadUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
     this.maxSizeMb = 5;
   }
 
@@ -15,20 +18,12 @@ class CloudinaryService {
       throw new Error(`La imagen no debe superar ${this.maxSizeMb} MB.`);
     }
 
-    const { data: { session } } = await db.auth.getSession();
-    if (!session?.access_token) {
-      throw new Error('Debes iniciar sesión como administrador.');
-    }
-
-    const firma = await this.obtenerFirma(session.access_token);
     const form = new FormData();
     form.append('file', archivo);
-    form.append('api_key', firma.apiKey);
-    form.append('timestamp', String(firma.timestamp));
-    form.append('folder', firma.folder);
-    form.append('signature', firma.signature);
+    form.append('upload_preset', this.uploadPreset);
+    form.append('folder', this.folder);
 
-    const respuesta = await fetch(`https://api.cloudinary.com/v1_1/${firma.cloudName}/image/upload`, {
+    const respuesta = await fetch(this.uploadUrl, {
       method: 'POST',
       body: form
     });
@@ -39,23 +34,6 @@ class CloudinaryService {
     }
 
     return datos.secure_url;
-  }
-
-  async obtenerFirma(accessToken) {
-    const respuesta = await fetch(this.uploadUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const datos = await respuesta.json().catch(() => ({}));
-    if (!respuesta.ok) {
-      throw new Error(datos.error || 'No se pudo autorizar la subida.');
-    }
-
-    return datos;
   }
 }
 
