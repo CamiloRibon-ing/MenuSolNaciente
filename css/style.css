@@ -512,7 +512,7 @@ nav a:hover::before {
   background: #f5f5f5;
   padding: 12px 0 14px;
   border-bottom: 2px solid #FFD700;
-  overflow-x: auto;
+  overflow: hidden;
   animation: fadeInDown 0.6s ease 0.3s backwards;
   position: sticky;
   top: 0;
@@ -583,22 +583,13 @@ nav a:hover::before {
   padding: 0 16px;
   justify-content: flex-start;
   overflow-x: auto;
+  scrollbar-width: none;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 
 .categorias-scroll::-webkit-scrollbar {
-  height: 4px;
-}
-
-.categorias-scroll::-webkit-scrollbar-track {
-  background: #e0e0e0;
-  border-radius: 10px;
-}
-
-.categorias-scroll::-webkit-scrollbar-thumb {
-  background: #FFD700;
-  border-radius: 10px;
+  display: none;
 }
 
 .cat-btn {
