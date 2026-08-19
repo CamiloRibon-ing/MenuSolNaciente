@@ -79,14 +79,10 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
 
     if (error) throw error;
 
-    // Verificar que sea admin
-    const { data: perfil, error: perfilError } = await db
-      .from('perfiles')
-      .select('nombre, rol')
-      .eq('id', data.user.id)
-      .single();
+    // Verificar que sea admin desde el backend
+    const { profile: perfil } = await apiClient.getProfile();
 
-    if (perfilError || !perfil) throw new Error('No se pudo obtener el perfil.');
+    if (!perfil) throw new Error('No se pudo obtener el perfil.');
     if (perfil.rol !== 'admin') throw new Error('Acceso denegado. No tienes permisos de administrador.');
 
     document.getElementById('nombre-admin').textContent = perfil.nombre;
@@ -115,11 +111,12 @@ document.getElementById('btn-cerrar-sesion').addEventListener('click', async () 
   const { data: { session } } = await db.auth.getSession();
   if (!session) return;
 
-  const { data: perfil } = await db
-    .from('perfiles')
-    .select('nombre, rol')
-    .eq('id', session.user.id)
-    .single();
+  let perfil = null;
+  try {
+    ({ profile: perfil } = await apiClient.getProfile());
+  } catch (err) {
+    return;
+  }
 
   if (perfil && perfil.rol === 'admin') {
     document.getElementById('nombre-admin').textContent = perfil.nombre;
@@ -137,6 +134,7 @@ async function iniciarPanel() {
   await cargarCategorias();
   await cargarProductos();
   configurarFiltros();
+  configurarTabOrdenar();
 }
 
 // ============================================================
@@ -149,6 +147,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab-contenido').forEach(c => c.classList.remove('activo'));
     tab.classList.add('activo');
     document.getElementById(`tab-${tab.dataset.tab}`).classList.add('activo');
+    if (tab.dataset.tab === 'ordenar') renderOrdenarTab();
   });
 });
 
@@ -157,19 +156,17 @@ document.querySelectorAll('.tab').forEach(tab => {
 // ============================================================
 
 async function cargarCategorias() {
-  const { data, error } = await db
-    .from('categorias')
-    .select('*')
-    .order('orden', { ascending: true });
-
-  if (error) {
+  try {
+    const { categorias: data } = await apiClient.listCategories();
+    categorias = data || [];
+  } catch (error) {
     mostrarToast('Error al cargar categorías', 'error');
     return;
   }
 
-  categorias = data || [];
   renderizarTablaCategorias();
   actualizarSelectCategorias();
+  renderOrdenarTab();
 }
 
 function renderizarTablaCategorias() {
@@ -240,7 +237,6 @@ function editarCategoria(id) {
   document.getElementById('categoria-id').value = cat.id;
   document.getElementById('categoria-nombre').value = cat.nombre;
   document.getElementById('categoria-emoji').value = cat.emoji || '';
-  document.getElementById('categoria-slug').value = cat.slug;
   document.getElementById('categoria-orden').value = cat.orden;
   document.getElementById('categoria-activa').checked = cat.activo;
   document.getElementById('modal-categoria-titulo').textContent = 'Editar Categoría';
@@ -250,29 +246,47 @@ function editarCategoria(id) {
 
 // ---- Toggle activo/inactivo categoría ----
 async function toggleCategoria(id, activo) {
-  const { error } = await db
-    .from('categorias')
-    .update({ activo: !activo })
-    .eq('id', id);
-
-  if (error) { mostrarToast('Error al actualizar', 'error'); return; }
-  mostrarToast(`Categoría ${!activo ? 'activada' : 'desactivada'}`);
-  await cargarCategorias();
+  try {
+    await apiClient.updateCategory(id, { activo: !activo });
+    mostrarToast(`Categoría ${!activo ? 'activada' : 'desactivada'}`);
+    await cargarCategorias();
+  } catch (error) {
+    mostrarToast('Error al actualizar', 'error');
+  }
 }
 
 // ---- Guardar categoría (crear o actualizar) ----
+function generarSlugCategoria(nombre) {
+  const slugBase = nombre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'categoria';
+
+  let slug = slugBase;
+  let consecutivo = 2;
+  const slugsExistentes = new Set(categorias.map(cat => cat.slug));
+  while (slugsExistentes.has(slug)) slug = `${slugBase}-${consecutivo++}`;
+  return slug;
+}
+
 document.getElementById('form-categoria').addEventListener('submit', async (e) => {
   e.preventDefault();
   ocultarError('error-categoria');
 
   const id = document.getElementById('categoria-id').value;
+  const nombre = document.getElementById('categoria-nombre').value.trim();
   const datos = {
-    nombre: document.getElementById('categoria-nombre').value.trim(),
+    nombre,
     emoji: document.getElementById('categoria-emoji').value.trim() || '🍽️',
-    slug: document.getElementById('categoria-slug').value.trim().toLowerCase(),
     orden: parseInt(document.getElementById('categoria-orden').value) || 0,
     activo: document.getElementById('categoria-activa').checked
   };
+
+  // El slug es un dato técnico: se crea automáticamente y se conserva al editar.
+  if (!id) datos.slug = generarSlugCategoria(nombre);
 
   const btnTexto = document.getElementById('texto-btn-categoria');
   const spinner = document.getElementById('spinner-categoria');
@@ -283,14 +297,11 @@ document.getElementById('form-categoria').addEventListener('submit', async (e) =
   spinner.style.display = 'inline-block';
 
   try {
-    let error;
     if (id) {
-      ({ error } = await db.from('categorias').update(datos).eq('id', id));
+      await apiClient.updateCategory(id, datos);
     } else {
-      ({ error } = await db.from('categorias').insert(datos));
+      await apiClient.createCategory(datos);
     }
-
-    if (error) throw error;
 
     mostrarToast(`Categoría ${id ? 'actualizada' : 'creada'} correctamente`);
     cerrarModal('modal-categoria');
@@ -310,13 +321,13 @@ function confirmarEliminarCategoria(id, nombre) {
   document.getElementById('texto-confirmar').textContent =
     `¿Eliminar la categoría "${nombre}"? Los productos de esta categoría no se podrán eliminar si tienen registros asociados.`;
   accionEliminar = async () => {
-    const { error } = await db.from('categorias').delete().eq('id', id);
-    if (error) {
-      mostrarToast('No se puede eliminar: tiene productos asociados.', 'error');
-    } else {
+    try {
+      await apiClient.deleteCategory(id);
       mostrarToast('Categoría eliminada');
       await cargarCategorias();
       await cargarProductos();
+    } catch (error) {
+      mostrarToast('No se puede eliminar: tiene productos asociados.', 'error');
     }
   };
   abrirModal('modal-confirmar');
@@ -327,18 +338,16 @@ function confirmarEliminarCategoria(id, nombre) {
 // ============================================================
 
 async function cargarProductos() {
-  const { data, error } = await db
-    .from('productos')
-    .select('*, categorias(nombre, emoji)')
-    .order('orden', { ascending: true });
-
-  if (error) {
+  try {
+    const { productos: data } = await apiClient.listProducts();
+    productos = data || [];
+  } catch (error) {
     mostrarToast('Error al cargar productos', 'error');
     return;
   }
 
-  productos = data || [];
   renderizarTablaProductos(productos);
+  renderOrdenarTab();
 }
 
 function renderizarTablaProductos(lista) {
@@ -598,14 +607,13 @@ function editarProducto(id) {
 
 // ---- Toggle activo/inactivo producto ----
 async function toggleProducto(id, activo) {
-  const { error } = await db
-    .from('productos')
-    .update({ activo: !activo })
-    .eq('id', id);
-
-  if (error) { mostrarToast('Error al actualizar', 'error'); return; }
-  mostrarToast(`Producto ${!activo ? 'activado' : 'desactivado'}`);
-  await cargarProductos();
+  try {
+    await apiClient.updateProduct(id, { activo: !activo });
+    mostrarToast(`Producto ${!activo ? 'activado' : 'desactivado'}`);
+    await cargarProductos();
+  } catch (error) {
+    mostrarToast('Error al actualizar', 'error');
+  }
 }
 
 // ---- Guardar producto (crear o actualizar) ----
@@ -635,14 +643,11 @@ document.getElementById('form-producto').addEventListener('submit', async (e) =>
   spinner.style.display = 'inline-block';
 
   try {
-    let error;
     if (id) {
-      ({ error } = await db.from('productos').update(datos).eq('id', id));
+      await apiClient.updateProduct(id, datos);
     } else {
-      ({ error } = await db.from('productos').insert(datos));
+      await apiClient.createProduct(datos);
     }
-
-    if (error) throw error;
 
     mostrarToast(`Producto ${id ? 'actualizado' : 'creado'} correctamente`);
     cerrarModal('modal-producto');
@@ -662,12 +667,12 @@ function confirmarEliminarProducto(id, nombre) {
   document.getElementById('texto-confirmar').textContent =
     `¿Eliminar el producto "${nombre}"? Esta acción no se puede deshacer.`;
   accionEliminar = async () => {
-    const { error } = await db.from('productos').delete().eq('id', id);
-    if (error) {
-      mostrarToast('Error al eliminar el producto.', 'error');
-    } else {
+    try {
+      await apiClient.deleteProduct(id);
       mostrarToast('Producto eliminado');
       await cargarProductos();
+    } catch (error) {
+      mostrarToast('Error al eliminar el producto.', 'error');
     }
   };
   abrirModal('modal-confirmar');
@@ -715,6 +720,261 @@ function previsualizarProducto(id) {
   estadoEl.style.display = 'inline-block';
 
   abrirModal('modal-preview');
+}
+
+// ============================================================
+// ORDENAR MENÚ - Drag & drop, ordenamiento rápido y vista previa
+// ============================================================
+
+function configurarTabOrdenar() {
+  const selectVista = document.getElementById('preview-vista-categoria');
+  if (selectVista) selectVista.addEventListener('change', renderPreviewOrdenar);
+}
+
+function renderOrdenarTab() {
+  const lista = document.getElementById('lista-categorias-ordenar');
+  const selectVista = document.getElementById('preview-vista-categoria');
+  if (!lista || !selectVista) return;
+
+  const categoriasOrdenadas = [...categorias].sort((a, b) => a.orden - b.orden);
+
+  const valorVistaActual = selectVista.value || 'todos';
+  selectVista.innerHTML = '<option value="todos">Todos</option>' +
+    categoriasOrdenadas.map(c => `<option value="${c.id}">${c.emoji || ''} ${escHtml(c.nombre)}</option>`).join('');
+  selectVista.value = categoriasOrdenadas.some(c => c.id === valorVistaActual) || valorVistaActual === 'todos'
+    ? valorVistaActual
+    : 'todos';
+
+  if (!categoriasOrdenadas.length) {
+    lista.innerHTML = '<p class="cargando">No hay categorías registradas.</p>';
+    renderPreviewOrdenar();
+    return;
+  }
+
+  lista.innerHTML = categoriasOrdenadas.map(cat => {
+    const productosCat = productos.filter(p => p.categoria_id === cat.id).sort((a, b) => a.orden - b.orden);
+
+    const itemsHtml = productosCat.map(p => {
+      const precio = p.precio_display || `$${Number(p.precio).toLocaleString('es-CO')}`;
+      const thumb = p.imagen_url
+        ? `<img class="prod-ordenar-thumb" src="${escHtml(p.imagen_url)}" alt="">`
+        : `<div class="prod-ordenar-thumb prod-ordenar-thumb-vacio"><i class="fa fa-image"></i></div>`;
+
+      return `
+        <li class="prod-ordenar-item" draggable="true" data-prod-id="${p.id}">
+          <i class="fa fa-grip-vertical drag-handle"></i>
+          ${thumb}
+          <span class="prod-ordenar-nombre">${escHtml(p.nombre)}</span>
+          <span class="prod-ordenar-precio">${escHtml(precio)}</span>
+          <span class="${p.activo ? 'badge-activo' : 'badge-inactivo'} prod-ordenar-badge">${p.activo ? 'Activo' : 'Inactivo'}</span>
+        </li>`;
+    }).join('');
+
+    return `
+      <div class="cat-ordenar-card" draggable="true" data-cat-id="${cat.id}">
+        <div class="cat-ordenar-header">
+          <i class="fa fa-grip-vertical drag-handle"></i>
+          <span class="cat-ordenar-emoji">${cat.emoji || '🍽️'}</span>
+          <strong class="cat-ordenar-nombre">${escHtml(cat.nombre)}</strong>
+          <span class="cat-ordenar-count">${productosCat.length} producto${productosCat.length === 1 ? '' : 's'}</span>
+          <div class="cat-ordenar-sort-btns">
+            <button type="button" data-cat-id="${cat.id}" data-sort="nombre-asc" title="Nombre A-Z"><i class="fa fa-arrow-down-a-z"></i></button>
+            <button type="button" data-cat-id="${cat.id}" data-sort="nombre-desc" title="Nombre Z-A"><i class="fa fa-arrow-up-a-z"></i></button>
+            <button type="button" data-cat-id="${cat.id}" data-sort="precio-asc" title="Precio: menor a mayor"><i class="fa fa-arrow-down-1-9"></i></button>
+            <button type="button" data-cat-id="${cat.id}" data-sort="precio-desc" title="Precio: mayor a menor"><i class="fa fa-arrow-up-9-1"></i></button>
+          </div>
+          <button type="button" class="cat-ordenar-toggle" title="Expandir/colapsar">
+            <i class="fa fa-chevron-down"></i>
+          </button>
+        </div>
+        <ul class="lista-productos-ordenar" data-cat-id="${cat.id}">
+          ${itemsHtml || '<li class="ordenar-vacio">Sin productos en esta categoría.</li>'}
+        </ul>
+      </div>`;
+  }).join('');
+
+  configurarArrastreOrdenar();
+  configurarBotonesSortOrdenar();
+  configurarTogglesOrdenar();
+  renderPreviewOrdenar();
+}
+
+// ---- Drag & drop genérico ----
+function habilitarArrastre(contenedor, selectorItem, onDrop) {
+  let arrastrando = null;
+
+  contenedor.addEventListener('dragstart', (e) => {
+    const item = e.target.closest(selectorItem);
+    if (!item || !contenedor.contains(item)) return;
+    e.stopPropagation();
+    arrastrando = item;
+    item.classList.add('arrastrando');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  contenedor.addEventListener('dragover', (e) => {
+    if (!arrastrando) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const item = e.target.closest(selectorItem);
+    if (!item || item === arrastrando) return;
+    const rect = item.getBoundingClientRect();
+    const despuesDe = (e.clientY - rect.top) / rect.height > 0.5;
+    item.parentElement.insertBefore(arrastrando, despuesDe ? item.nextSibling : item);
+  });
+
+  contenedor.addEventListener('drop', (e) => {
+    if (!arrastrando) return;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  contenedor.addEventListener('dragend', async () => {
+    if (!arrastrando) return;
+    arrastrando.classList.remove('arrastrando');
+    arrastrando = null;
+    await onDrop();
+  });
+}
+
+function configurarArrastreOrdenar() {
+  const listaCategorias = document.getElementById('lista-categorias-ordenar');
+  if (!listaCategorias) return;
+
+  habilitarArrastre(listaCategorias, '.cat-ordenar-card', async () => {
+    const ids = [...listaCategorias.querySelectorAll('.cat-ordenar-card')].map(el => el.dataset.catId);
+    await guardarOrdenCategorias(ids);
+  });
+
+  document.querySelectorAll('.lista-productos-ordenar').forEach(ul => {
+    habilitarArrastre(ul, '.prod-ordenar-item', async () => {
+      const ids = [...ul.querySelectorAll('.prod-ordenar-item')].map(el => el.dataset.prodId).filter(Boolean);
+      await guardarOrdenProductosCategoria(ul.dataset.catId, ids);
+    });
+  });
+}
+
+function configurarBotonesSortOrdenar() {
+  document.querySelectorAll('.cat-ordenar-sort-btns button').forEach(btn => {
+    btn.addEventListener('click', () => ordenarProductosCategoria(btn.dataset.catId, btn.dataset.sort));
+  });
+}
+
+function configurarTogglesOrdenar() {
+  document.querySelectorAll('.cat-ordenar-card').forEach(card => {
+    const btn = card.querySelector('.cat-ordenar-toggle');
+    const ul = card.querySelector('.lista-productos-ordenar');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const colapsado = ul.style.display === 'none';
+      ul.style.display = colapsado ? '' : 'none';
+      btn.querySelector('i').className = colapsado ? 'fa fa-chevron-down' : 'fa fa-chevron-up';
+    });
+  });
+}
+
+// ---- Ordenamiento rápido por nombre/precio ----
+function ordenarProductosCategoria(catId, criterio) {
+  const lista = productos.filter(p => p.categoria_id === catId);
+  let ordenados;
+
+  switch (criterio) {
+    case 'nombre-asc': ordenados = [...lista].sort((a, b) => a.nombre.localeCompare(b.nombre)); break;
+    case 'nombre-desc': ordenados = [...lista].sort((a, b) => b.nombre.localeCompare(a.nombre)); break;
+    case 'precio-asc': ordenados = [...lista].sort((a, b) => a.precio - b.precio); break;
+    case 'precio-desc': ordenados = [...lista].sort((a, b) => b.precio - a.precio); break;
+    default: return;
+  }
+
+  guardarOrdenProductosCategoria(catId, ordenados.map(p => p.id));
+}
+
+// ---- Persistencia en Supabase ----
+async function persistirOrden(tabla, idsOrdenados) {
+  try {
+    await apiClient.reorder(tabla, idsOrdenados);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function guardarOrdenCategorias(idsOrdenados) {
+  const ok = await persistirOrden('categorias', idsOrdenados);
+  if (!ok) { mostrarToast('Error al guardar el orden de categorías', 'error'); return; }
+
+  idsOrdenados.forEach((id, idx) => {
+    const cat = categorias.find(c => c.id === id);
+    if (cat) cat.orden = (idx + 1) * 10;
+  });
+
+  mostrarToast('Orden de categorías actualizado');
+  renderizarTablaCategorias();
+  renderOrdenarTab();
+}
+
+async function guardarOrdenProductosCategoria(catId, idsOrdenados) {
+  const ok = await persistirOrden('productos', idsOrdenados);
+  if (!ok) { mostrarToast('Error al guardar el orden de productos', 'error'); return; }
+
+  idsOrdenados.forEach((id, idx) => {
+    const p = productos.find(x => x.id === id);
+    if (p) p.orden = (idx + 1) * 10;
+  });
+
+  mostrarToast('Orden de productos actualizado');
+  renderizarTablaProductos(productos);
+  renderOrdenarTab();
+}
+
+// ---- Vista previa en vivo (réplica del menú público) ----
+function renderPreviewOrdenar() {
+  const contenedor = document.getElementById('preview-menu-contenedor');
+  const selectVista = document.getElementById('preview-vista-categoria');
+  if (!contenedor || !selectVista) return;
+
+  const vista = selectVista.value || 'todos';
+  const categoriasActivas = [...categorias].filter(c => c.activo).sort((a, b) => a.orden - b.orden);
+  const productosActivos = productos.filter(p => p.activo);
+
+  let lista;
+  if (vista === 'todos') {
+    lista = categoriasActivas.flatMap(cat =>
+      productosActivos.filter(p => p.categoria_id === cat.id).sort((a, b) => a.orden - b.orden)
+    );
+  } else {
+    lista = productosActivos.filter(p => p.categoria_id === vista).sort((a, b) => a.orden - b.orden);
+  }
+
+  contenedor.innerHTML = lista.length
+    ? lista.map(p => crearTarjetaPreviewOrdenar(p)).join('')
+    : '<p class="ordenar-preview-vacio">No hay productos activos en esta vista.</p>';
+}
+
+function crearTarjetaPreviewOrdenar(p) {
+  const imgHtml = p.imagen_url
+    ? `<img src="${escHtml(p.imagen_url)}" alt="${escHtml(p.nombre)}" loading="lazy">`
+    : `<div class="card-sin-imagen">🍽️</div>`;
+
+  const badgeHtml = p.etiqueta ? `<span class="card-badge">${escHtml(p.etiqueta)}</span>` : '';
+  const descHtml = p.descripcion ? `<p class="card-desc">${escHtml(p.descripcion)}</p>` : '';
+  const precioDisplay = p.precio_display || `$${Number(p.precio || 0).toLocaleString('es-CO')}`;
+
+  return `
+    <div class="card">
+      <div class="card-imagen">
+        ${imgHtml}
+        ${badgeHtml}
+      </div>
+      <div class="card-body">
+        <h3>${escHtml(p.nombre)}</h3>
+        ${descHtml}
+        <div class="card-footer-row">
+          <span class="price">${escHtml(precioDisplay)}</span>
+          <button class="btn-ver" title="Ver detalles"><i class="fa fa-eye"></i></button>
+        </div>
+      </div>
+    </div>`;
 }
 
 // ============================================================

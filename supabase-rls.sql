@@ -45,6 +45,25 @@ with check (
   )
 );
 
+-- Habilita Supabase Realtime para que el menú público se actualice
+-- automáticamente cuando el admin reordena/edita categorías o productos.
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'categorias'
+  ) then
+    alter publication supabase_realtime add table public.categorias;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'productos'
+  ) then
+    alter publication supabase_realtime add table public.productos;
+  end if;
+end $$;
+
 create policy "productos_public_read_active"
 on public.productos
 for select

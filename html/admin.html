@@ -73,6 +73,9 @@
       <button class="tab" data-tab="categorias">
         <i class="fa fa-tags"></i> Categorías
       </button>
+      <button class="tab" data-tab="ordenar">
+        <i class="fa fa-sort"></i> Ordenar Menú
+      </button>
     </div>
 
     <!-- ===== TAB PRODUCTOS ===== -->
@@ -148,6 +151,36 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ===== TAB ORDENAR MENÚ ===== -->
+    <div id="tab-ordenar" class="tab-contenido">
+
+      <div class="barra-acciones">
+        <h2>Ordenar Menú</h2>
+        <p class="ordenar-ayuda">
+          <i class="fa fa-circle-info"></i>
+          Arrastra las categorías y los productos para definir el orden en que los verán los clientes. Los cambios se guardan automáticamente.
+        </p>
+      </div>
+
+      <div class="ordenar-layout">
+        <div class="ordenar-categorias" id="lista-categorias-ordenar">
+          <p class="cargando"><span class="spinner"></span> Cargando...</p>
+        </div>
+
+        <aside class="ordenar-preview-live">
+          <div class="ordenar-preview-header">
+            <h4><i class="fa fa-eye"></i> Vista previa en tiempo real</h4>
+            <select id="preview-vista-categoria">
+              <option value="todos">Todos</option>
+            </select>
+          </div>
+          <div class="ordenar-preview-pantalla">
+            <div id="preview-menu-contenedor" class="menu-grid"></div>
+          </div>
+        </aside>
       </div>
     </div>
 
@@ -294,18 +327,9 @@
         </div>
       </div>
 
-      <div class="dos-columnas">
-        <div class="campo">
-          <label for="categoria-slug">
-            Slug *
-            <span class="ayuda" title="Identificador único de URL (sin espacios ni tildes). Ej: picadas">?</span>
-          </label>
-          <input type="text" id="categoria-slug" placeholder="picadas" required pattern="[a-z0-9\-]+">
-        </div>
-        <div class="campo">
-          <label for="categoria-orden">Orden</label>
-          <input type="number" id="categoria-orden" placeholder="0" min="0" value="0">
-        </div>
+      <div class="campo">
+        <label for="categoria-orden">Orden</label>
+        <input type="number" id="categoria-orden" placeholder="0" min="0" value="0">
       </div>
 
       <div class="campo-check">
@@ -369,6 +393,7 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="../js/supabase.js"></script>
+<script src="../js/api.js"></script>
 <script src="../js/cloudinary.js"></script>
 <script src="admin.js"></script>
 </body>

@@ -1,11 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const preloader = document.getElementById('preloader');
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      if (preloader) preloader.classList.add('hide');
-    }, 600);
-  });
-
   const toggle = document.getElementById('menu-toggle');
   const nav = document.getElementById('navbar');
 

@@ -9,32 +9,87 @@ let busquedaActual = '';
 
 const WHATSAPP_PEDIDOS = '573044891274';
 
-(async function cargarMenu() {
+// URLs remotas para registros antiguos cuya imagen_url aún está vacía en Supabase.
+const IMAGENES_CLOUDINARY_PRODUCTOS = {
+  'chorizo': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146581/menusolnaciente/r83rmmz5wk99zhql0jip.jpg',
+  'arroz': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146583/menusolnaciente/mwpakgcbk7qx1yrkdivl.jpg',
+  'coca-cola-personal': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146588/menusolnaciente/rmysyppegpzrmq09bzm5.jpg',
+  'costilla': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146592/menusolnaciente/ienfow53xxs9mwus1ajq.jpg',
+  'picada-xs': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146593/menusolnaciente/tpchfq4sbznq0k7h2oby.jpg',
+  'picada-s': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146595/menusolnaciente/ux3bu1v3fqg0evvzqlmj.jpg',
+  'picada-m': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146597/menusolnaciente/eafq3wov5yutsa2s9vd1.jpg',
+  'gallina': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146599/menusolnaciente/m61kb8nftrcnukpbg0hw.jpg',
+  'sopa': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146601/menusolnaciente/qp5y0vkrukqvj8wo3rdi.jpg',
+  'speed-max': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146604/menusolnaciente/zkwfwb7vdaz7alalunfi.jpg',
+  'sopa-y-arroz': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146606/menusolnaciente/qcuisumnso53swmbvi1p.jpg',
+  'desayuno-tipo-1': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146610/menusolnaciente/dcdaicajwlb98haicfla.webp',
+  'desayuno-tipo-2': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146612/menusolnaciente/zohc4tjbaetlonjchacb.jpg',
+  'papa-a-la-francesa': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146617/menusolnaciente/ttyvgp30zz0obrgpmegb.jpg',
+  'patacones': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146619/menusolnaciente/lhaqdsvz9s1qupera1ww.jpg',
+  'soda': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146621/menusolnaciente/zf2zhnbemvoqmcsovddf.jpg',
+  'soda-ginger': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146624/menusolnaciente/ivjym5ygb5ceyyu5j9es.jpg',
+  'limonada-natural': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146626/menusolnaciente/g4racck1nmub2ieoccx1.jpg',
+  'limonada-de-coco': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146629/menusolnaciente/kfjjx73hvagecsj83dhf.jpg',
+  'limonada-cerezada': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146635/menusolnaciente/s1ichbnnlechbzoesyiv.jpg',
+  'maracuya': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146637/menusolnaciente/qfyiaijr5sppwet3jstg.jpg',
+  'old-parr-750ml': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146640/menusolnaciente/kdg9oilgho5ixp16aygi.jpg',
+  'buchanan-s-master-750ml': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146643/menusolnaciente/uburblf33txe79bgk25z.jpg',
+  'medellin-8-anos': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146645/menusolnaciente/lnk7e65btofgafvnfmxg.jpg',
+  'medellin-3-anos': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146647/menusolnaciente/jih6cxseepi190cmpwah.jpg',
+  'aguardiente-amarrillo': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146648/menusolnaciente/nt18xxwjtybkrrtmrm0n.jpg',
+  'aguardiente-pipona': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146650/menusolnaciente/gdgbsjmottqgsncmf05f.jpg',
+  'aguardiente-limosina': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146652/menusolnaciente/zamhbg90abpiujk1dhzu.jpg',
+  'aguardiente-garrafon': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146654/menusolnaciente/awji5aoqeamordbjikdz.jpg',
+  'poker': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146655/menusolnaciente/kow7jxkjo7i9qoygf8ia.jpg',
+  'budweiser': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146657/menusolnaciente/ibp7oci7r1wut7gkaswk.jpg',
+  'aguila-negra': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146659/menusolnaciente/ia3stiswf6lbcn6pixy8.jpg',
+  'aguilita-negra': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146661/menusolnaciente/gqwhch8tdad9wo1waonv.jpg',
+  'aguila-light': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146662/menusolnaciente/kiodkskf5dizb9wkycuq.jpg',
+  'aguilita-light': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146667/menusolnaciente/ns5hu1g8shnca8rbmbsm.jpg',
+  'raspado-de-kola': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146669/menusolnaciente/iiubjdsiyqcazovfrdtt.jpg',
+  'raspado-de-maracuya': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146671/menusolnaciente/e2tk1dm9rxkpufgosxgr.jpg',
+  'raspado-de-chicle': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146672/menusolnaciente/fuhkrtc8tyl0x5ga4qih.jpg',
+  'frutos-rojos': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146674/menusolnaciente/iy9dc2ds1tiz7qxh1yel.jpg',
+  'manzana-verde': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146675/menusolnaciente/mjegryxa7vlv7hjhdvz3.jpg',
+  'kiwi': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146676/menusolnaciente/va60t1nnxm5zwc04hgfi.jpg',
+  'mango-verde': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146679/menusolnaciente/sgzbiu7yugfhtecyblm7.jpg',
+  'fresa': 'https://res.cloudinary.com/dczdtij3q/image/upload/v1787146680/menusolnaciente/jbrqnr1tioeqjsksn3yl.jpg'
+};
+
+function claveProducto(nombre) {
+  return String(nombre || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function obtenerImagenProducto(producto) {
+  const url = producto.imagen_url || IMAGENES_CLOUDINARY_PRODUCTOS[claveProducto(producto.nombre)] || '';
+  return url.includes('res.cloudinary.com/')
+    ? url.replace('/image/upload/', '/image/upload/f_auto,q_auto:good,w_900,c_limit/')
+    : url;
+}
+
+(async function inicio() {
+  configurarBuscador();
+  await cargarMenu();
+  suscribirseATiempoReal();
+})();
+
+async function cargarMenu() {
   const contenedor = document.getElementById('menu-contenedor');
   const categoriasScroll = document.getElementById('categorias-scroll');
   const navEl = document.getElementById('navbar');
 
-  configurarBuscador();
   mostrarSkeleton(contenedor);
 
   try {
-    const { data: categorias, error: errCat } = await db
-      .from('categorias')
-      .select('id, nombre, emoji, slug, orden')
-      .eq('activo', true)
-      .order('orden', { ascending: true });
-
-    if (errCat) throw errCat;
+    const { categorias, productos } = await apiClient.getMenu();
     categoriasGlobal = categorias || [];
 
-    const { data: productos, error: errProd } = await db
-      .from('productos')
-      .select('id, nombre, descripcion, precio, precio_display, imagen_url, etiqueta, orden, categoria_id')
-      .eq('activo', true)
-      .order('orden', { ascending: true });
-
-    if (errProd) throw errProd;
-    productosMenu = productos || [];
+    // Para la vista "Todos" se agrupa por el orden de categoría definido por el admin
+    // y, dentro de cada categoría, por el orden de producto definido por el admin.
+    productosMenu = categoriasGlobal.flatMap(cat =>
+      (productos || []).filter(p => p.categoria_id === cat.id)
+    );
 
     const porCategoria = agruparProductosPorCategoria(categoriasGlobal, productosMenu);
     const categoriasConProductos = categoriasGlobal.filter(cat => porCategoria[cat.id]?.length > 0);
@@ -46,7 +101,23 @@ const WHATSAPP_PEDIDOS = '573044891274';
     console.error('Error al cargar el menú:', err);
     mostrarDatosPrueba();
   }
-})();
+}
+
+// ---- Actualización en tiempo real cuando el admin modifica el menú ----
+function suscribirseATiempoReal() {
+  if (!db?.channel) return;
+
+  let recargaProgramada = null;
+  const recargarConDebounce = () => {
+    clearTimeout(recargaProgramada);
+    recargaProgramada = setTimeout(cargarMenu, 350);
+  };
+
+  db.channel('menu-publico-cambios')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'productos' }, recargarConDebounce)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'categorias' }, recargarConDebounce)
+    .subscribe();
+}
 
 function agruparProductosPorCategoria(categorias, productos) {
   const porCategoria = {};
@@ -181,8 +252,9 @@ function mostrarProductosFiltrados(productos) {
 }
 
 function crearTarjeta(p) {
-  const imgHtml = p.imagen_url
-    ? `<img src="${escMenu(p.imagen_url)}" alt="${escMenu(p.nombre)}" loading="lazy">`
+  const imagen = obtenerImagenProducto(p);
+  const imgHtml = imagen
+    ? `<img src="${escMenu(imagen)}" alt="${escMenu(p.nombre)}" loading="lazy">`
     : `<div class="card-sin-imagen">🍽️</div>`;
 
   const badgeHtml = p.etiqueta ? `<span class="card-badge">${escMenu(p.etiqueta)}</span>` : '';
@@ -211,9 +283,10 @@ function crearTarjeta(p) {
 function abrirDetalle(producto) {
   const modal = document.getElementById('modal-detalle');
   const precioDisplay = producto.precio_display || `$${Number(producto.precio || 0).toLocaleString('es-CO')}`;
+  const imagen = obtenerImagenProducto(producto);
 
-  document.getElementById('detalle-img-wrap').innerHTML = producto.imagen_url
-    ? `<img src="${escMenu(producto.imagen_url)}" alt="${escMenu(producto.nombre)}" loading="lazy">`
+  document.getElementById('detalle-img-wrap').innerHTML = imagen
+    ? `<img src="${escMenu(imagen)}" alt="${escMenu(producto.nombre)}" loading="lazy">`
     : '<div class="detalle-sin-img">🍽️</div>';
 
   const badge = document.getElementById('detalle-badge');

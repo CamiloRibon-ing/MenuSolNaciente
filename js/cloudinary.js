@@ -1,14 +1,10 @@
 // ============================================================
 // SERVICIO DE CLOUDINARY - Sol Naciente
-// Usa el unsigned upload preset configurado en Cloudinary.
+// Delega la subida al backend TypeScript en /api/uploads.
 // ============================================================
 class CloudinaryService {
   constructor() {
-    this.cloudName = 'dczdtij3q';
-    this.uploadPreset = 'luni_products';
-    this.folder = 'menusolnaciente';
-    this.uploadUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
-    this.maxSizeMb = 5;
+    this.maxSizeMb = 3;
   }
 
   async subirImagen(archivo) {
@@ -18,21 +14,7 @@ class CloudinaryService {
       throw new Error(`La imagen no debe superar ${this.maxSizeMb} MB.`);
     }
 
-    const form = new FormData();
-    form.append('file', archivo);
-    form.append('upload_preset', this.uploadPreset);
-    form.append('folder', this.folder);
-
-    const respuesta = await fetch(this.uploadUrl, {
-      method: 'POST',
-      body: form
-    });
-
-    const datos = await respuesta.json().catch(() => ({}));
-    if (!respuesta.ok) {
-      throw new Error(datos.error?.message || 'Error al subir la imagen');
-    }
-
+    const datos = await apiClient.uploadImage(archivo);
     return datos.secure_url;
   }
 }
