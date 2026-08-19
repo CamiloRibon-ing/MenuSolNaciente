@@ -99,7 +99,16 @@ async function cargarMenu() {
     aplicarFiltros();
   } catch (err) {
     console.error('Error al cargar el menú:', err);
-    mostrarDatosPrueba();
+    categoriasGlobal = [];
+    productosMenu = [];
+    categoriasScroll.innerHTML = '';
+    navEl.innerHTML = '';
+    contenedor.innerHTML = `
+      <div class="estado-vacio">
+        <i class="fa fa-triangle-exclamation"></i>
+        <h3>No pudimos cargar el menú</h3>
+        <p>Actualiza la página en unos segundos.</p>
+      </div>`;
   }
 }
 
@@ -356,30 +365,6 @@ function crearEstadoVacio() {
       <p>${mensaje}</p>
     </div>
   `;
-}
-
-function mostrarDatosPrueba() {
-  const categoriasScroll = document.getElementById('categorias-scroll');
-  const navEl = document.getElementById('navbar');
-
-  categoriasGlobal = [
-    { id: '1', nombre: 'Picadas', emoji: '🍟', slug: 'picadas' },
-    { id: '2', nombre: 'Almuerzos', emoji: '🍽️', slug: 'almuerzos' },
-    { id: '3', nombre: 'Desayunos', emoji: '🥞', slug: 'desayunos' },
-  ];
-
-  productosMenu = [
-    { id: '1', nombre: 'Papas Fritas', descripcion: 'Papas fritas crujientes', precio: 15000, precio_display: '$15.000', etiqueta: 'Popular', imagen_url: 'https://via.placeholder.com/300x240?text=Papas+Fritas', categoria_id: '1', orden: 1 },
-    { id: '2', nombre: 'Alas de Pollo', descripcion: 'Alas de pollo apanadas', precio: 18000, precio_display: '$18.000', etiqueta: 'Recomendado', imagen_url: 'https://via.placeholder.com/300x240?text=Alas+Pollo', categoria_id: '1', orden: 2 },
-    { id: '3', nombre: 'Bandeja Paisa', descripcion: 'Tradicional bandeja paisa', precio: 25000, precio_display: '$25.000', etiqueta: 'Especial', imagen_url: 'https://via.placeholder.com/300x240?text=Bandeja+Paisa', categoria_id: '2', orden: 1 },
-    { id: '4', nombre: 'Ajiaco', descripcion: 'Ajiaco caliente y delicioso', precio: 16000, precio_display: '$16.000', etiqueta: null, imagen_url: 'https://via.placeholder.com/300x240?text=Ajiaco', categoria_id: '2', orden: 2 },
-    { id: '5', nombre: 'Arepas con Queso', descripcion: 'Arepas caseras recién hechas', precio: 8000, precio_display: '$8.000', etiqueta: null, imagen_url: 'https://via.placeholder.com/300x240?text=Arepas', categoria_id: '3', orden: 1 },
-    { id: '6', nombre: 'Huevos Rancheros', descripcion: 'Huevos con salsa y tortillas', precio: 12000, precio_display: '$12.000', etiqueta: 'Popular', imagen_url: 'https://via.placeholder.com/300x240?text=Huevos+Rancheros', categoria_id: '3', orden: 2 },
-  ];
-
-  renderizarCategorias(categoriasGlobal, categoriasScroll);
-  renderizarNavbar(categoriasGlobal, navEl);
-  aplicarFiltros();
 }
 
 function normalizarTexto(texto) {
